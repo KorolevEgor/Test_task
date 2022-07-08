@@ -1,4 +1,4 @@
-import java.util.function.Function;
+package stringReverse;
 
 public class StringReverseByteArray implements StringReverse {
     @Override
