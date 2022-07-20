@@ -1,0 +1,236 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+            https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+
+    <changeSet id="1.0.0" author="egor.korolyov">
+        <createTable tableName="roles">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar2(30)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="created" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar2(30)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="users">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="varchar2(30)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="email" type="varchar2(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="first_name" type="varchar2(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="varchar2(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar2(150)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar2(30)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="user_roles">
+            <column name="user_id" type="bigint"/>
+            <column name="role_id" type="bigint"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="user_roles"
+                                 baseColumnNames="user_id"
+                                 constraintName="FK_many_to_many_user_roles_to_users"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="user_roles"
+                                 baseColumnNames="role_id"
+                                 constraintName="FK_many_to_many_user_roles_to_roles"
+                                 referencedTableName="roles"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+
+    <changeSet id="1.0.1" author="egor.korolyov">
+        <createTable tableName="species">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar2(70)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="pets">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="species" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="birthdate" type="date"/>
+            <column name="gender" type="varchar2(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar2(20)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="owner" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="pets"
+                                 baseColumnNames="species"
+                                 constraintName="FK_pets_species_species_id"
+                                 referencedTableName="species"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="pets"
+                                 baseColumnNames="owner"
+                                 constraintName="FK_pets_owner_users_id"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+
+    <changeSet id="1.0.2" author="egor.korolyov">
+        <insert tableName="roles">
+            <column name="name" value="ROLE_ADMIN"/>
+            <column name="status" value="ACTIVE"/>
+        </insert>
+
+        <insert tableName="roles">
+            <column name="name" value="ROLE_USER"/>
+            <column name="status" value="ACTIVE"/>
+        </insert>
+    </changeSet>
+
+
+    <changeSet id="1.0.3" author="egor.korolyov">
+        <!--      [dev only] password: admin      -->
+        <insert tableName="users">
+            <column name="username" value="admin"/>
+            <column name="first_name" value="admin"/>
+            <column name="last_name" value="admin"/>
+            <column name="email" value="admin@admin.com"/>
+            <column name="password" value="{bcrypt}$2a$10$rJoskjVQuUyKgSthG0w6burb5jh5.Mkr.RG//gBo5LXrIFT5pZpL."/>
+            <column name="status" value="ACTIVE"/>
+        </insert>
+
+        <!--      [dev only] password: ivan      -->
+        <insert tableName="users">
+            <column name="username" value="test_user"/>
+            <column name="first_name" value="ivan"/>
+            <column name="last_name" value="ivanov"/>
+            <column name="email" value="i.ivanov@gmail.com"/>
+            <column name="password" value="{bcrypt}$2a$10$a9SuDYydSw2hIvY55L9KreNiS9pTmiBEX3fi8JoBOpXwb2w3PaVLm"/>
+            <column name="status" value="ACTIVE"/>
+        </insert>
+
+        <!--      [dev only] password: petr      -->
+        <insert tableName="users">
+            <column name="username" value="test_user_2"/>
+            <column name="first_name" value="petr"/>
+            <column name="last_name" value="petrov"/>
+            <column name="email" value="p.petrov@gmail.com"/>
+            <column name="password" value="{bcrypt}$2a$12$jqZV3187zmEmwBPMEV3y8.xbOe4912XAi5FpIZOXGPCoM0X18db0m"/>
+            <column name="status" value="ACTIVE"/>
+        </insert>
+    </changeSet>
+
+
+    <changeSet id="1.0.4" author="egor.korolyov">
+        <insert tableName="user_roles">
+            <column name="user_id" value="1"/>
+            <column name="role_id" value="1"/>
+        </insert>
+
+        <insert tableName="user_roles">
+            <column name="user_id" value="1"/>
+            <column name="role_id" value="2"/>
+        </insert>
+
+        <insert tableName="user_roles">
+            <column name="user_id" value="2"/>
+            <column name="role_id" value="2"/>
+        </insert>
+
+        <insert tableName="user_roles">
+            <column name="user_id" value="3"/>
+            <column name="role_id" value="2"/>
+        </insert>
+    </changeSet>
+
+
+    <changeSet id="1.0.5" author="egor.korolyov">
+        <insert tableName="species">
+            <column name="name" value="DOG"/>
+        </insert>
+
+        <insert tableName="species">
+            <column name="name" value="CAT"/>
+        </insert>
+
+        <insert tableName="species">
+            <column name="name" value="GUINEA_PIG"/>
+        </insert>
+
+        <insert tableName="species">
+            <column name="name" value="CHINCHILLA_LANIGERA"/>
+        </insert>
+
+        <insert tableName="species">
+            <column name="name" value="GOLDFISH"/>
+        </insert>
+    </changeSet>
+
+
+    <changeSet id="1.0.6" author="egor.korolyov">
+        <insert tableName="pets">
+            <column name="species" value="1"/>
+            <column name="birthdate" value="2020-02-04"/>
+            <column name="gender" value="MALE"/>
+            <column name="name" value="Tanner"/>
+            <column name="owner" value="2"/>
+        </insert>
+
+        <insert tableName="pets">
+            <column name="species" value="2"/>
+            <column name="birthdate" value="2019-02-04"/>
+            <column name="gender" value="FEMALE"/>
+            <column name="name" value="Rainbow"/>
+            <column name="owner" value="2"/>
+        </insert>
+
+        <insert tableName="pets">
+            <column name="species" value="3"/>
+            <column name="birthdate" value="2017-05-05"/>
+            <column name="gender" value="MALE"/>
+            <column name="name" value="Bandicoot"/>
+            <column name="owner" value="3"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
